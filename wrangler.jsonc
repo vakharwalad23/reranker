@@ -7,6 +7,7 @@
   "name": "reranker",
   "main": "src/index.ts",
   "compatibility_date": "2025-06-06",
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "binding": "ASSETS",
     "directory": "./public"
@@ -16,5 +17,14 @@
   },
   "placement": {
     "mode": "smart"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RERANK_CACHE",
+      "id": "a3d6d98e9e924212b6ad14d913b3a7dc"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
   }
 }
