@@ -11,7 +11,13 @@ import {
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
-app.use("*", cors());
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST"],
+  })
+);
 app.use("*", logger());
 
 // Lazy load SmartReranker to avoid startup overhead
