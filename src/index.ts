@@ -2,7 +2,12 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { CACHE_CONFIG } from "./config";
-import { RerankItem, RerankRequest, RerankResponse } from "./types";
+import {
+  ExcludeFactor,
+  RerankItem,
+  RerankRequest,
+  RerankResponse,
+} from "./types";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -23,9 +28,7 @@ async function getSmartReranker() {
 async function mathRerank(
   query: string,
   items: RerankItem[],
-  excludeFactors: Array<
-    "vectorScore" | "semanticScore" | "length" | "recency" | "queryTermMatch"
-  > = []
+  excludeFactors: ExcludeFactor[] = []
 ): Promise<RerankItem[]> {
   const reranker = await getSmartReranker();
   return reranker.rerank(query, items, excludeFactors);
