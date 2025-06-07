@@ -7,9 +7,16 @@
     "tail": "wrangler tail"
   },
   "dependencies": {
-    "hono": "^4.7.11"
+    "compromise": "^14.14.4",
+    "fuse.js": "^7.1.0",
+    "hono": "^4.7.11",
+    "natural": "^8.1.0",
+    "stopword": "^3.1.4",
+    "string-similarity": "^4.0.4"
   },
   "devDependencies": {
+    "@types/stopword": "^2.0.3",
+    "@types/string-similarity": "^4.0.2",
     "wrangler": "^4.19.1"
   }
 }

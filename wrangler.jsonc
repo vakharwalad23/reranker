@@ -21,7 +21,8 @@
   "kv_namespaces": [
     {
       "binding": "RERANK_CACHE",
-      "id": "a3d6d98e9e924212b6ad14d913b3a7dc"
+      "id": "a3d6d98e9e924212b6ad14d913b3a7dc",
+      "preview_id": "c43f7d98869644768f0dd02224742750"
     }
   ],
   "ai": {

@@ -1,21 +1,26 @@
-interface RerankItem {
+export interface RerankItem {
   id: string;
   content: string;
   length?: number;
   finalScore?: number;
 }
 
-interface RerankRequest {
+export type ExcludeFactor =
+  | "vectorScore"
+  | "semanticScore"
+  | "length"
+  | "recency"
+  | "queryTermMatch";
+
+export interface RerankRequest {
   query: string;
   items: RerankItem[];
-  excludeFactors?: Array<
-    "vectorScore" | "semanticScore" | "length" | "recency" | "queryTermMatch"
-  >;
+  excludeFactors?: ExcludeFactor[];
   mode?: "math" | "ai";
   topK?: number;
 }
 
-interface RerankResponse {
+export interface RerankResponse {
   items: RerankItem[];
   method: "math" | "ai";
   cached?: boolean;
