@@ -105,49 +105,67 @@ export class SmartReranker {
     allContents: string[]
   ): number {
     try {
-      this.tfidf = new natural.TfIdf();
+      const tfidf = new natural.TfIdf();
 
       allContents.forEach((doc) => {
-        this.tfidf.addDocument(this.preprocessText(doc).join(" "));
+        tfidf.addDocument(this.preprocessText(doc).join(" "));
       });
 
-      this.tfidf.addDocument(this.preprocessText(query).join(" "));
+      // Add query as the last document
+      tfidf.addDocument(this.preprocessText(query).join(" "));
 
-      const queryIndex = allContents.length;
+      const queryIndex = allContents.length; // Query is at the end
       const contentIndex = allContents.findIndex((doc) => doc === content);
 
       if (contentIndex === -1) return 0;
 
-      const queryTerms = this.tfidf.listTerms(queryIndex);
-      const contentTerms = this.tfidf.listTerms(contentIndex);
+      // Get TF-IDF terms for both documents
+      const queryTerms = tfidf.listTerms(queryIndex);
+      const contentTerms = tfidf.listTerms(contentIndex);
 
       if (queryTerms.length === 0 || contentTerms.length === 0) return 0;
 
-      const queryMap = new Map<string, number>();
-      const contentMap = new Map<string, number>();
+      const queryVector = new Map<string, number>();
+      const contentVector = new Map<string, number>();
 
       queryTerms.forEach((term: any) => {
-        queryMap.set(term.term, term.tfidf);
+        queryVector.set(term.term, term.tfidf);
       });
+
       contentTerms.forEach((term: any) => {
-        contentMap.set(term.term, term.tfidf);
+        contentVector.set(term.term, term.tfidf);
       });
 
-      let overlap = 0;
-      let queryWeight = 0;
-
-      queryMap.forEach((weight, term) => {
-        queryWeight += weight;
-        if (contentMap.has(term)) {
-          overlap += Math.min(weight, contentMap.get(term) || 0);
-        }
-      });
-
-      return queryWeight > 0 ? overlap / queryWeight : 0;
+      return this.calculateCosineSimilarity(queryVector, contentVector);
     } catch (error) {
       console.error("TF-IDF calculation error:", error);
       return 0;
     }
+  }
+
+  private calculateCosineSimilarity(
+    vectorA: Map<string, number>,
+    vectorB: Map<string, number>
+  ): number {
+    const allTerms = new Set([...vectorA.keys(), ...vectorB.keys()]);
+
+    let dotProduct = 0;
+    let magnitudeA = 0;
+    let magnitudeB = 0;
+
+    // Calculate dot product and magnitudes
+    for (const term of allTerms) {
+      const weightA = vectorA.get(term) || 0;
+      const weightB = vectorB.get(term) || 0;
+
+      dotProduct += weightA * weightB;
+      magnitudeA += weightA * weightA;
+      magnitudeB += weightB * weightB;
+    }
+
+    // Avoid division by zero
+    const magnitude = Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB);
+    return magnitude > 0 ? dotProduct / magnitude : 0;
   }
 
   private calculateStringSimilarity(query: string, content: string): number {
@@ -368,16 +386,6 @@ export class SmartReranker {
           ...item,
           finalScore,
           length: item.content.length,
-          debug: {
-            vectorScore: scores.vectorScore,
-            semanticScore: scores.semanticScore,
-            queryTermMatch: scores.queryTermMatch,
-            stringScore,
-            fuzzyScore,
-            recency: scores.recency,
-            lengthScore: scores.length,
-            excludedFactors: excludeFactors,
-          },
         };
       })
       .sort((a, b) => (b.finalScore || 0) - (a.finalScore || 0));

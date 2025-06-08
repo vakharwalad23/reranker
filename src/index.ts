@@ -8,6 +8,7 @@ import {
   RerankRequest,
   RerankResponse,
 } from "./types";
+import { SmartReranker } from "./services/SmartReranker";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -23,7 +24,7 @@ app.use("*", logger());
 // Lazy load SmartReranker to avoid startup overhead
 let smartRerankerInstance: any = null;
 
-async function getSmartReranker() {
+async function getSmartReranker(): Promise<SmartReranker> {
   if (!smartRerankerInstance) {
     const { SmartReranker } = await import("./services/SmartReranker");
     smartRerankerInstance = new SmartReranker();
